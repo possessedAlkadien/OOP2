@@ -17,10 +17,38 @@ class File:
             print("Произошла ошибка! Такого файла не существует.")
 
     def xmlFile(self,file):
-        print("q")
+        XMLdata = []
+        content = file.read()
+        content = content.replace("\n", "").replace("\r", "")
+        count = 1
+        while "<" in content:
+            if count>2:
+                start = content.index("<") + len("<")
+                end = content.index("/>")
+                entry_block = content[start:end]
+
+                city = entry_block[entry_block.index("item city=") + len("item city="):entry_block.index(" ")].strip()
+                street = entry_block[entry_block.index("street=") + len("street="):entry_block.index(" ")].strip()
+                house = entry_block[entry_block.index("house=") + len("house="):entry_block.index(" ")].strip()
+                floors = entry_block[entry_block.index("floor=") + len("floor="):entry_block.index(" ")].strip()
+
+                XMLdata.append((city, street, house, floors))
+                content = content[end + len("/>"):]
+            count+=1
+        print(count)
+        print(XMLdata[1:5])
+        return XMLdata
 
     def csvFile(self,file):
-        print("q")
+        CSVdata = []
+        count = 0
+        for line in file:
+            line = line.strip()
+            count+=1
+            if line and count!=1:
+                city,street,house,floors = line.split(";")
+                CSVdata.append((city.strip(), street.strip(), house.strip(), int(floors.strip())))
+        return CSVdata
 
 
 def main():
@@ -36,7 +64,7 @@ def main():
             if '.xml' in path:
                 userFile.xmlFile(file)
             elif '.csv' in path:
-                userFile.csvFile(file)
+                data = userFile.csvFile(file)
             else:
                 print("Формат файла не поддерживается.")
 
