@@ -27,16 +27,14 @@ class File:
                 end = content.index("/>")
                 entry_block = content[start:end]
 
-                city = entry_block[entry_block.index("item city=") + len("item city="):entry_block.index(" ")].strip()
-                street = entry_block[entry_block.index("street=") + len("street="):entry_block.index(" ")].strip()
-                house = entry_block[entry_block.index("house=") + len("house="):entry_block.index(" ")].strip()
-                floors = entry_block[entry_block.index("floor=") + len("floor="):entry_block.index(" ")].strip()
+                city = content.split('city="')[1].split('"')[0]
+                street = content.split('street="')[1].split('"')[0]
+                house = content.split('house="')[1].split('"')[0]
+                floors = int(content.split('floor="')[1].split('"')[0])
 
                 XMLdata.append((city, street, house, floors))
                 content = content[end + len("/>"):]
             count+=1
-        print(count)
-        print(XMLdata[1:5])
         return XMLdata
 
     def csvFile(self,file):
@@ -62,7 +60,7 @@ def main():
         else:
             file = open(path)
             if '.xml' in path:
-                userFile.xmlFile(file)
+                data = userFile.xmlFile(file)
             elif '.csv' in path:
                 data = userFile.csvFile(file)
             else:
