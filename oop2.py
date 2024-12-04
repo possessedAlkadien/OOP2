@@ -1,5 +1,6 @@
 import os
 import time
+import re
 
 data = []
 
@@ -22,21 +23,15 @@ class File:
         XMLdata = []
         content = file.read()
         content = content.replace("\n", "").replace("\r", "")
-        count = 1
-        while "<" in content:
-            if count>2:
-                start = content.index("<") + len("<")
-                end = content.index("/>")
-                entry_block = content[start:end]
 
-                city = content.split('city="')[1].split('"')[0]
-                street = content.split('street="')[1].split('"')[0]
-                house = content.split('house="')[1].split('"')[0]
-                floors = content.split('floor="')[1].split('"')[0]
+        pattern = r'<item city="(.*?)" street="(.*?)" house="(.*?)" floor="(.*?)" />'
 
-                XMLdata.append((city, street, house, floors))
-                content = content[end + len("/>"):]
-            count+=1
+        matches = re.findall(pattern, content)
+
+        for match in matches:
+            city, street, house, floors = match
+            XMLdata.append((city, street, house, floors))
+
         return XMLdata
 
     def csvFile(self,file):
@@ -65,11 +60,13 @@ class Statistics:
         print("Количество этажей в городах: \n")
         counter = {}
         for address in Fdata:
-            counter[address[3]] = counter.get(address[3],0)+1
+            cityfloor = "Город:"+address[0]+" , Этажи:"+address[3]
+            counter[cityfloor] = counter.get(cityfloor,0)+1
         duplicates = {dupl: count for dupl,count in counter.items()}
         duplicates = sorted(duplicates.items(), key=lambda item: item[0])
-        print(duplicates)
-        print("\n")
+        for dup in duplicates:
+            print(dup)
+            print("\n")
 
 
 
